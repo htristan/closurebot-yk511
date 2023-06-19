@@ -90,7 +90,6 @@ def check_and_post_events():
                 if table.get_item(Key={'EventID': event['ID']}).get('Item') is None:
                     # If the event is within the specified area and has not been posted before, post it to Discord
                     post_to_discord(event)
-                    return
                     # Set the EventID key in the event data
                     event['EventID'] = event['ID']
                     # Convert float values in the event to Decimal
@@ -100,5 +99,3 @@ def check_and_post_events():
 
 def lambda_handler(event, context):
     check_and_post_events()
-
-check_and_post_events()
