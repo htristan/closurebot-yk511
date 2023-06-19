@@ -4,8 +4,7 @@ import time
 import boto3
 from shapely.geometry import Point, Polygon
 from decimal import Decimal
-import discord
-from discord import Embed
+from discord_webhook import DiscordWebhook, DiscordEmbed
 import os
 from datetime import datetime
 from pytz import timezone
@@ -26,8 +25,7 @@ polygon = Polygon([
     (43.67878795749117, -79.93304294115251)
 ])
 
-
-DISCORD_TOKEN = os.environ['DISCORD_TOKEN']
+DISCORD_WEBHOOK_URL = os.environ['DISCORD_WEBHOOK']
 AWS_ACCESS_KEY_ID = os.environ['AWS_DB_KEY']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_DB_SECRET_ACCESS_KEY']
 CHANNEL_ID = '1120047133802897408'
@@ -59,29 +57,19 @@ def unix_to_readable(unix_timestamp):
     return eastern_time.strftime('%Y-%b-%d %I:%M %p')
 
 def post_to_discord(event):
-    # Create a Discord bot client
-    intents = discord.Intents.default()
-    client = discord.Client(intents=intents)
+    # Create a webhook instance
+    webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL)
 
-    @client.event
-    async def on_ready():
-        # Find the target channel by ID
-        channel = client.get_channel(int(CHANNEL_ID))
-        if channel:
-            embed = Embed(title=f"ON511 Closure Update", color=discord.Color.red())
-            embed.add_field(name="Road", value=event['RoadwayName'], inline=False)
-            embed.add_field(name="Event Type", value=event['EventType'], inline=False)
-            embed.add_field(name="Information", value=event['Description'], inline=False)
-            embed.add_field(name="Start Time", value=unix_to_readable(event['StartDate']), inline=False)
-            embed.add_field(name="Direction", value=event['DirectionOfTravel'], inline=False)
-            embed.add_field(name="511 Link", value="https://511on.ca/map#Closures-" + event['ID'], inline=False)
-            # Send the closure notification
-            await channel.send(embed=embed)
-        else:
-            print(f'Failed to find the Discord channel with ID: {CHANNEL_ID}')
-        await client.close()
-
-    client.run(DISCORD_TOKEN)
+    embed = DiscordEmbed(title=f"ON511 Closure Update", color=15548997)
+    embed.add_embed_field(name="Road", value=event['RoadwayName'], inline=False)
+    embed.add_embed_field(name="Event Type", value=event['EventType'], inline=False)
+    embed.add_embed_field(name="Information", value=event['Description'], inline=False)
+    embed.add_embed_field(name="Start Time", value=unix_to_readable(event['StartDate']), inline=False)
+    embed.add_embed_field(name="Direction", value=event['DirectionOfTravel'], inline=False)
+    embed.add_embed_field(name="511 Link", value="https://511on.ca/map#Closures-" + event['ID'], inline=False)
+    # Send the closure notification
+    webhook.add_embed(embed)
+    webhook.execute()
 
 def check_and_post_events():
     # Perform API call to ON511 API
@@ -101,7 +89,8 @@ def check_and_post_events():
                 # Check if the event ID is already in the DynamoDB table
                 if table.get_item(Key={'EventID': event['ID']}).get('Item') is None:
                     # If the event is within the specified area and has not been posted before, post it to Discord
-                    #post_to_discord(event)
+                    post_to_discord(event)
+                    return
                     # Set the EventID key in the event data
                     event['EventID'] = event['ID']
                     # Convert float values in the event to Decimal
