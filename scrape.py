@@ -12,16 +12,18 @@ from pytz import timezone
 
 # Define the coordinates of your polygon
 polygon = Polygon([
-    (44.47984078392659, -77.30731051927751),
-    (44.49551610233738, -80.62518161302752),
-    (43.35612986160339, -82.07537692552752),
-    (42.14608621729842, -82.53680270677752),
+    (43.67878795749117, -79.93304294115251),
+    (43.66090777561015, -80.55651706224626),
+    (43.276195634296236, -82.07263034349626),
+    (42.8548164344217, -82.28274386888688),
+    (42.29456999770389, -82.46813815599626),
+    (42.22443967103919, -81.72244113451188),
     (42.38998433799022, -80.97674411302752),
     (42.72985557217411, -79.52654880052752),
     (42.84273447508291, -78.86187594896501),
-    (43.455899767226875, -79.17498630052751),
-    (43.7542233321237, -78.71356051927752),
-    (44.47984078392659, -77.30731051927751)
+    (43.268196428606124, -79.06237643724626),
+    (43.30418457436259, -79.67211764818376),
+    (43.67878795749117, -79.93304294115251)
 ])
 
 
@@ -71,7 +73,7 @@ def post_to_discord(event):
             embed.add_field(name="Event Type", value=event['EventType'], inline=False)
             embed.add_field(name="Information", value=event['Description'], inline=False)
             embed.add_field(name="Start Time", value=unix_to_readable(event['StartDate']), inline=False)
-            embed.add_field(name="Details", value=event['Comment'], inline=False)
+            embed.add_field(name="Direction", value=event['DirectionOfTravel'], inline=False)
             embed.add_field(name="511 Link", value="https://511on.ca/map#Closures-" + event['ID'], inline=False)
             # Send the closure notification
             await channel.send(embed=embed)
@@ -95,17 +97,17 @@ def check_and_post_events():
             # Create a point from the event's coordinates
             point = Point(event['Latitude'], event['Longitude'])
             # Check if the point is within the polygon
-            if polygon.contains(point) | True:
+            if polygon.contains(point):
                 # Check if the event ID is already in the DynamoDB table
                 if table.get_item(Key={'EventID': event['ID']}).get('Item') is None:
                     # If the event is within the specified area and has not been posted before, post it to Discord
-                    post_to_discord(event)
+                    #post_to_discord(event)
                     # Set the EventID key in the event data
                     event['EventID'] = event['ID']
                     # Convert float values in the event to Decimal
                     event = float_to_decimal(event)
                     # Add the event ID to the DynamoDB table
-                    #table.put_item(Item=event)
+                    table.put_item(Item=event)
 
 def lambda_handler(event, context):
     check_and_post_events()
