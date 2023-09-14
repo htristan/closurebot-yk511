@@ -49,10 +49,6 @@ def float_to_decimal(event):
             event[key] = float_to_decimal(value)
     return event
 
-def getThreadID(threadName):
-    # Hard coded to one for YK version
-    return config['Thread-CatchAll'] #Other catch all thread
-
 def unix_to_readable(unix_timestamp):
     utc_time = datetime.utcfromtimestamp(int(unix_timestamp))
     local_tz = timezone(config['timezone'])
@@ -61,7 +57,7 @@ def unix_to_readable(unix_timestamp):
 
 def post_to_discord_closure(event,threadName=None):
     # Create a webhook instance
-    threadID = getThreadID(threadName)
+    threadID = None # Hard coded for YK version
     if threadID is not None:
         webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL, username=discordUsername, avatar_url=discordAvatarURL, thread_id=threadID)
     else:
@@ -97,7 +93,7 @@ def post_to_discord_closure(event,threadName=None):
 def post_to_discord_updated(event,threadName=None):
     # Function to post to discord that an event was updated (already previously reported)
     # Create a webhook instance
-    threadID = getThreadID(threadName)
+    threadID = None # Hard coded for YK version
     if threadID is not None:
         webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL, username=discordUsername, avatar_url=discordAvatarURL, thread_id=threadID)
     else:
@@ -134,7 +130,7 @@ def post_to_discord_updated(event,threadName=None):
 
 def post_to_discord_completed(event,threadName=None):
     # Create a webhook instance
-    threadID = getThreadID(threadName)
+    threadID = None # Hard coded for YK version
     if threadID is not None:
         webhook = DiscordWebhook(url=DISCORD_WEBHOOK_URL, username=discordUsername, avatar_url=discordAvatarURL, thread_id=threadID)
     else:
