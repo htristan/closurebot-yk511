@@ -1,3 +1,4 @@
 config.json
 .env_vars
 venv/
+__pycache__/
