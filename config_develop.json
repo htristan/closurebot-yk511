@@ -1,6 +1,8 @@
 {
   "db_name": "YK511-ClosureDB-Dev",
   "function_name": "ClosureBot-YK511-Dev",
+  "api_endpoint": "https://511yukon.ca/api/v2/get/event",
+  "api_priv_key": "True",
   "license_notice": "Contains information licensed under the Open Government Licence – Yukon.",
   "timezone": "Canada/Yukon"
 }
