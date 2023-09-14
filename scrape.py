@@ -306,7 +306,7 @@ DISCORD_WEBHOOK_URL = os.environ['DISCORD_WEBHOOK']
 AWS_ACCESS_KEY_ID = os.environ['AWS_DB_KEY']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_DB_SECRET_ACCESS_KEY']
 
-discordUsername = "ON511"
+discordUsername = "YK511"
 discordAvatarURL = "https://pbs.twimg.com/profile_images/1256233970905341959/EKlyRkOM_400x400.jpg"
 
 # Create a DynamoDB resource object
@@ -479,10 +479,10 @@ def check_and_post_events():
         # Update last execution day to current date
         update_last_execution_day()
 
-    # Perform API call to ON511 API
-    response = requests.get("https://511on.ca/api/v2/get/event")
+    # Perform API call to YK511 API
+    response = requests.get("https://511yukon.ca/api/v2/get/event")
     if not response.ok:
-        raise Exception('Issue connecting to ON511 API')
+        raise Exception('Issue connecting to YK511 API')
 
     #use the response to close out anything recent
     close_recent_events(response)
