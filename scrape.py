@@ -170,7 +170,10 @@ def check_and_post_events():
         update_last_execution_day()
 
     # Perform API call to YK511 API
-    response = requests.get("https://511yukon.ca/api/v2/get/event")
+    params = dict()
+    if config['api_priv_key'] == 'True' and config['api_priv_key'] is not None:
+        params["key"] = os.environ['API_KEY']
+    response = requests.get(config['api_endpoint'], params=params)
     if not response.ok:
         raise Exception('Issue connecting to YK511 API')
 
